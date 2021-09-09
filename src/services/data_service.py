@@ -50,3 +50,15 @@ def find_cages_for_user(account: Owner) -> List[Cage]:
     query = Cage.objects(id__in=account.cage_ids)
     cages = list(query)
     return cages
+
+
+def add_available_date(cage: Cage, start_date: datetime.datetime, days: int) -> Cage:
+    booking = Booking()
+    booking.check_in_date = start_date
+    booking.check_out_date = start_date + datetime.timedelta(days)
+
+    cage = Cage.objects(id=cage.id).first()
+    cage.bookings.append(booking)
+    cage.save()
+
+    return cage
