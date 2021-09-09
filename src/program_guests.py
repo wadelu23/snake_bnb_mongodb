@@ -97,13 +97,64 @@ def view_your_snakes():
 
 def book_a_cage():
     print(' ****************** Book a cage **************** ')
-    # TODO: Require an account
-    # TODO: Verify they have a snake
-    # TODO: Get dates and select snake
-    # TODO: Find cages available across date range
-    # TODO: Let user select cage to book.
+    if not state.active_account:
+        error_msg("You must log in first to book a cage")
+        return
 
-    print(" -------- NOT IMPLEMENTED -------- ")
+    snakes = svc.get_snakes_for_user(state.active_account.id)
+    if not snakes:
+        error_msg('You must first [a]dd a snake before you can book a cage.')
+        return
+
+    print("Let's start by finding available cages.")
+    start_text = input("Check-in date [yyyy-mm-dd]: ")
+    if not start_text:
+        error_msg('cancelled')
+        return
+
+    checkin = parser.parse(
+        start_text
+    )
+
+    checkout = parser.parse(
+        input("Check-out date [yyyy-mm-dd]: ")
+    )
+
+    if checkin >= checkout:
+        error_msg('Check in must be before check out')
+        return
+
+    print()
+    for idx, s in enumerate(snakes):
+        print('{}. {} (length: {}, venomous: {})'.format(
+            idx + 1,
+            s.name,
+            s.length,
+            'yes' if s.is_venomous else 'no'
+        ))
+
+    snake = snakes[int(input('Which snake do you want to book (number)')) - 1]
+
+    cages = svc.get_available_cages(checkin, checkout, snake)
+
+    print("There are {} cages available in that time.".format(len(cages)))
+    for idx, c in enumerate(cages):
+        print(" {}. {} with {}m carpeted: {}, has toys: {}.".format(
+            idx + 1,
+            c.name,
+            c.square_meters,
+            'yes' if c.is_carpeted else 'no',
+            'yes' if c.has_toys else 'no'))
+
+    if not cages:
+        error_msg("Sorry, no cages are available for that date.")
+        return
+
+    cage = cages[int(input('Which cage do you want to book (number)')) - 1]
+    svc.book_cage(state.active_account, snake, cage, checkin, checkout)
+
+    success_msg(
+        'Successfully booked {} for {} at ${}/night.'.format(cage.name, snake.name, cage.price))
 
 
 def view_bookings():
