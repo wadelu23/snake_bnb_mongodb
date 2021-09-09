@@ -1,5 +1,10 @@
+import datetime
+from dateutil import parser
+
 from infrastructure.switchlang import switch
 import program_hosts as hosts
+import services.data_service as svc
+from program_hosts import success_msg, error_msg
 import infrastructure.state as state
 
 
@@ -53,20 +58,41 @@ def show_commands():
 
 def add_a_snake():
     print(' ****************** Add a snake **************** ')
-    # TODO: Require an account
-    # TODO: Get snake info from user
-    # TODO: Create the snake in the DB.
+    if not state.active_account:
+        error_msg("You must log in first to add a snake")
+        return
 
-    print(" -------- NOT IMPLEMENTED -------- ")
+    name = input("What is your snake's name? ")
+    if not name:
+        error_msg('cancelled')
+        return
+
+    length = float(input('How long is your snake (in meters)? '))
+    species = input("Species? ")
+    is_venomous = input(
+        "Is your snake venomous [y]es, [n]o? ").lower().startswith('y')
+
+    snake = svc.add_snake(state.active_account, name,
+                          length, species, is_venomous)
+    state.reload_account()
+    success_msg('Created {} with id {}'.format(snake.name, snake.id))
 
 
 def view_your_snakes():
     print(' ****************** Your snakes **************** ')
+    if not state.active_account:
+        error_msg("You must log in first to view your snakes")
+        return
 
-    # TODO: Require an account
-    # TODO: Get snakes from DB, show details list
-
-    print(" -------- NOT IMPLEMENTED -------- ")
+    snakes = svc.get_snakes_for_user(state.active_account.id)
+    print("You have {} snakes.".format(len(snakes)))
+    for s in snakes:
+        print(" * {} is a {} that is {}m long and is {}venomous.".format(
+            s.name,
+            s.species,
+            s.length,
+            '' if s.is_venomous else 'not '
+        ))
 
 
 def book_a_cage():
