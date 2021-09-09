@@ -65,10 +65,15 @@ def create_account():
 def log_into_account():
     print(' ****************** LOGIN **************** ')
 
-    # TODO: Get email
-    # TODO: Find account in DB, set as logged in.
+    email = input('What is your email? ').strip().lower()
+    account = svc.find_account_by_email(email)
 
-    print(" -------- NOT IMPLEMENTED -------- ")
+    if not account:
+        error_msg(f'Could not find account with email {email}.')
+        return
+
+    state.active_account = account
+    success_msg('Logged in successfully.')
 
 
 def register_cage():
