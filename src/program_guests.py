@@ -159,7 +159,19 @@ def book_a_cage():
 
 def view_bookings():
     print(' ****************** Your bookings **************** ')
-    # TODO: Require an account
-    # TODO: List booking info along with snake info
+    if not state.active_account:
+        error_msg("You must log in first to register a cage")
+        return
 
-    print(" -------- NOT IMPLEMENTED -------- ")
+    snakes = {s.id: s for s in svc.get_snakes_for_user(
+        state.active_account.id)}
+
+    bookings = svc.get_bookings_for_user(state.active_account.email)
+
+    print(f'You have {len(bookings)} bookings.')
+    for b in bookings:
+        snake_name = snakes.get(b.guest_snake_id).name
+        check_in_date = datetime.date(b.check_in_date.year, b.check_in_date.month, b.check_in_date.day)
+        booked_days = (b.check_out_date - b.check_in_date).days
+        
+        print(f'* Snake: {snake_name} is booked at {b.cage.name} from {check_in_date} for {booked_days} days.')
