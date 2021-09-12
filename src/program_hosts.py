@@ -143,7 +143,7 @@ def update_availability():
     print(' ****************** Add available date **************** ')
 
     if not state.active_account:
-        error_msg("You must log in first to update date")
+        error_msg(state.remind_login_msg("update date"))
         return
 
     list_cages(supress_header=True)
@@ -186,7 +186,7 @@ def view_bookings():
     print(' ****************** Your bookings **************** ')
 
     if not state.active_account:
-        error_msg("You must log in first to view bookings")
+        error_msg(state.remind_login_msg("view bookings"))
         return
 
     cages = svc.find_cages_for_user(state.active_account)
