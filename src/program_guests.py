@@ -59,7 +59,7 @@ def show_commands():
 def add_a_snake():
     print(' ****************** Add a snake **************** ')
     if not state.active_account:
-        error_msg("You must log in first to add a snake")
+        error_msg(state.remind_login_msg("add a snake"))
         return
 
     name = input("What is your snake's name? ")
@@ -81,7 +81,7 @@ def add_a_snake():
 def view_your_snakes():
     print(' ****************** Your snakes **************** ')
     if not state.active_account:
-        error_msg("You must log in first to view your snakes")
+        error_msg(state.remind_login_msg("view your snakes"))
         return
 
     snakes = svc.get_snakes_for_user(state.active_account.id)
@@ -98,7 +98,7 @@ def view_your_snakes():
 def book_a_cage():
     print(' ****************** Book a cage **************** ')
     if not state.active_account:
-        error_msg("You must log in first to book a cage")
+        error_msg(state.remind_login_msg("book a cage"))
         return
 
     snakes = svc.get_snakes_for_user(state.active_account.id)
@@ -160,7 +160,7 @@ def book_a_cage():
 def view_bookings():
     print(' ****************** Your bookings **************** ')
     if not state.active_account:
-        error_msg("You must log in first to register a cage")
+        error_msg(state.remind_login_msg("view your bookings"))
         return
 
     snakes = {s.id: s for s in svc.get_snakes_for_user(

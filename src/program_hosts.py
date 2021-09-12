@@ -83,7 +83,7 @@ def register_cage():
     print(' ****************** REGISTER CAGE **************** ')
 
     if not state.active_account:
-        error_msg('You must login first to register a cage')
+        error_msg(state.remind_login_msg("register a cage"))
         return
 
     meters = input('How many square meters is the cage? ')
@@ -114,7 +114,7 @@ def list_cages(supress_header=False):
         print(' ******************     Your cages     **************** ')
 
     if not state.active_account:
-        error_msg('You must login first to register a cage')
+        error_msg(state.remind_login_msg("view cages"))
         return
 
     cages = svc.find_cages_for_user(state.active_account)
@@ -133,7 +133,7 @@ def update_availability():
     print(' ****************** Add available date **************** ')
 
     if not state.active_account:
-        error_msg("You must log in first to register a cage")
+        error_msg("You must log in first to update date")
         return
 
     list_cages(supress_header=True)
@@ -169,7 +169,7 @@ def view_bookings():
     print(' ****************** Your bookings **************** ')
 
     if not state.active_account:
-        error_msg("You must log in first to register a cage")
+        error_msg("You must log in first to view bookings")
         return
 
     cages = svc.find_cages_for_user(state.active_account)
