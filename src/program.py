@@ -1,4 +1,5 @@
 from colorama import Fore
+from dateutil import parser
 import program_guests
 import program_hosts
 import data.mogo_setup as mongo_setup
@@ -59,6 +60,37 @@ def find_user_intent():
         return 'offer'
 
     return 'book'
+
+
+def ensure_input_value(text, type='float'):
+    """確保輸入值的型態，目前支援日期、浮點數、整數
+
+    若輸入值不為空，但型態錯誤，則會一直顯示問句給使用者重新輸入
+
+    Args:
+        text ([type]): 詢問輸入的問句
+        type (str, optional): 型態. Defaults to 'float'.
+
+    Returns:
+        [type]: 若輸入值為空則回傳False，其餘則返回正確型態
+    """
+    ValueErr = True
+    while ValueErr:
+        try:
+            val = input(text)
+            if not val:
+                return False
+            if type == 'date':
+                val = parser.parse(val)
+            elif type == 'int':
+                val = int(val)
+            else:
+                val = float(val)
+            ValueErr = False
+        except (ValueError, parser.ParserError):
+            print(f'wrong type, please try again')
+
+    return val
 
 
 if __name__ == '__main__':

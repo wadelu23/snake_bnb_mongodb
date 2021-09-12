@@ -5,6 +5,7 @@ from dateutil import parser
 from infrastructure.switchlang import switch
 import infrastructure.state as state
 import services.data_service as svc
+from program import ensure_input_value
 
 
 def run():
@@ -86,18 +87,27 @@ def register_cage():
         error_msg(state.remind_login_msg("register a cage"))
         return
 
-    meters = input('How many square meters is the cage? ')
+    meters = ensure_input_value(
+        'How many square meters is the cage? ', type='float')
     if not meters:
         error_msg('Cancelled')
         return
 
-    meters = float(meters)
     carpeted = input("Is it carpeted [y, n]? ").lower().startswith('y')
     has_toys = input("Have snake toys [y, n]? ").lower().startswith('y')
     allow_dangerous = input(
         "Can you host venomous snakes [y, n]? ").lower().startswith('y')
+
     name = input("Give your cage a name: ")
-    price = float(input("How much are you charging?  "))
+    if not name:
+        error_msg('Cancelled')
+        return
+
+    price = ensure_input_value(
+        'How much are you charging? ', type='float')
+    if not price:
+        error_msg('Cancelled')
+        return
 
     cage = svc.register_cage(
         state.active_account, name,
@@ -151,10 +161,17 @@ def update_availability():
 
     success_msg("Selected cage {}".format(selected_cage.name))
 
-    start_date = parser.parse(
-        input("Enter available date [yyyy-mm-dd]: ")
-    )
-    days = int(input("How many days is this block of time? "))
+    start_date = ensure_input_value(
+        'Enter available date [yyyy-mm-dd]: ', type='date')
+    if not start_date:
+        error_msg('Cancelled')
+        return
+
+    days = ensure_input_value(
+        'How many days is this block of time? ', type='int')
+    if not days:
+        error_msg('Cancelled')
+        return
 
     svc.add_available_date(
         selected_cage,

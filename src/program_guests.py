@@ -5,6 +5,7 @@ from infrastructure.switchlang import switch
 import program_hosts as hosts
 import services.data_service as svc
 from program_hosts import success_msg, error_msg
+from program import ensure_input_value
 import infrastructure.state as state
 
 
@@ -67,7 +68,12 @@ def add_a_snake():
         error_msg('cancelled')
         return
 
-    length = float(input('How long is your snake (in meters)? '))
+    text = 'How long is your snake (in meters)? '
+    length = ensure_input_value(text, type='float')
+    if not length:
+        error_msg('cancelled')
+        return
+
     species = input("Species? ")
     is_venomous = input(
         "Is your snake venomous [y]es, [n]o? ").lower().startswith('y')
@@ -107,18 +113,25 @@ def book_a_cage():
         return
 
     print("Let's start by finding available cages.")
-    start_text = input("Check-in date [yyyy-mm-dd]: ")
-    if not start_text:
+    ask_check_in_text = "Check-in date [yyyy-mm-dd]: "
+    checkin = ensure_input_value(ask_check_in_text, type='date')
+    if not checkin:
         error_msg('cancelled')
         return
 
-    checkin = parser.parse(
-        start_text
-    )
+    check_in_ahead_days = 6
+    now = datetime.datetime.now()
+    while (checkin - now).days < check_in_ahead_days:
+        print("Notice: only ahead 7 days ")
+        checkin = ensure_input_value(ask_check_in_text, type='date')
+        if not checkin:
+            error_msg('cancelled')
+            return
 
-    checkout = parser.parse(
-        input("Check-out date [yyyy-mm-dd]: ")
-    )
+    checkout = ensure_input_value("Check-out date [yyyy-mm-dd]: ", type='date')
+    if not checkout:
+        error_msg('cancelled')
+        return
 
     if checkin >= checkout:
         error_msg('Check in must be before check out')
@@ -171,7 +184,11 @@ def view_bookings():
     print(f'You have {len(bookings)} bookings.')
     for b in bookings:
         snake_name = snakes.get(b.guest_snake_id).name
-        check_in_date = datetime.date(b.check_in_date.year, b.check_in_date.month, b.check_in_date.day)
+        check_in_date = datetime.date(
+            b.check_in_date.year,
+            b.check_in_date.month,
+            b.check_in_date.day)
         booked_days = (b.check_out_date - b.check_in_date).days
-        
-        print(f'* Snake: {snake_name} is booked at {b.cage.name} from {check_in_date} for {booked_days} days.')
+
+        print(
+            f'* Snake: {snake_name} is booked at {b.cage.name} from {check_in_date} for {booked_days} days.')
